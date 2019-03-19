@@ -236,109 +236,6 @@ class PorterStemmer:
         else:
             pass
         return word
-
-    def step2(self, word):
-        if word.endswith('ational'):
-            word = self.replaceM0(word, 'ational', 'ate')
-        elif word.endswith('tional'):
-            word = self.replaceM0(word, 'tional', 'tion')
-        elif word.endswith('enci'):
-            word = self.replaceM0(word, 'enci', 'ence')
-        elif word.endswith('anci'):
-            word = self.replaceM0(word, 'anci', 'ance')
-        elif word.endswith('izer'):
-            word = self.replaceM0(word, 'izer', 'ize')
-        elif word.endswith('abli'):
-            word = self.replaceM0(word, 'abli', 'able')
-        elif word.endswith('alli'):
-            word = self.replaceM0(word, 'alli', 'al')
-        elif word.endswith('entli'):
-            word = self.replaceM0(word, 'entli', 'ent')
-        elif word.endswith('eli'):
-            word = self.replaceM0(word, 'eli', 'e')
-        elif word.endswith('ousli'):
-            word = self.replaceM0(word, 'ousli', 'ous')
-        elif word.endswith('ization'):
-            word = self.replaceM0(word, 'ization', 'ize')
-        elif word.endswith('ation'):
-            word = self.replaceM0(word, 'ation', 'ate')
-        elif word.endswith('ator'):
-            word = self.replaceM0(word, 'ator', 'ate')
-        elif word.endswith('alism'):
-            word = self.replaceM0(word, 'alism', 'al')
-        elif word.endswith('iveness'):
-            word = self.replaceM0(word, 'iveness', 'ive')
-        elif word.endswith('fulness'):
-            word = self.replaceM0(word, 'fulness', 'ful')
-        elif word.endswith('ousness'):
-            word = self.replaceM0(word, 'ousness', 'ous')
-        elif word.endswith('aliti'):
-            word = self.replaceM0(word, 'aliti', 'al')
-        elif word.endswith('iviti'):
-            word = self.replaceM0(word, 'iviti', 'ive')
-        elif word.endswith('biliti'):
-            word = self.replaceM0(word, 'biliti', 'ble')
-        return word
-
-    def step3(self, word):
-        if word.endswith('icate'):
-            word = self.replaceM0(word, 'icate', 'ic')
-        elif word.endswith('ative'):
-            word = self.replaceM0(word, 'ative', '')
-        elif word.endswith('alize'):
-            word = self.replaceM0(word, 'alize', 'al')
-        elif word.endswith('iciti'):
-            word = self.replaceM0(word, 'iciti', 'ic')
-        elif word.endswith('ful'):
-            word = self.replaceM0(word, 'ful', '')
-        elif word.endswith('ness'):
-            word = self.replaceM0(word, 'ness', '')
-        return word
-
-    def step4(self, word):
-        if word.endswith('al'):
-            word = self.replaceM1(word, 'al', '')
-        elif word.endswith('ance'):
-            word = self.replaceM1(word, 'ance', '')
-        elif word.endswith('ence'):
-            word = self.replaceM1(word, 'ence', '')
-        elif word.endswith('er'):
-            word = self.replaceM1(word, 'er', '')
-        elif word.endswith('ic'):
-            word = self.replaceM1(word, 'ic', '')
-        elif word.endswith('able'):
-            word = self.replaceM1(word, 'able', '')
-        elif word.endswith('ible'):
-            word = self.replaceM1(word, 'ible', '')
-        elif word.endswith('ant'):
-            word = self.replaceM1(word, 'ant', '')
-        elif word.endswith('ement'):
-            word = self.replaceM1(word, 'ement', '')
-        elif word.endswith('ment'):
-            word = self.replaceM1(word, 'ment', '')
-        elif word.endswith('ent'):
-            word = self.replaceM1(word, 'ent', '')
-        elif word.endswith('ou'):
-            word = self.replaceM1(word, 'ou', '')
-        elif word.endswith('ism'):
-            word = self.replaceM1(word, 'ism', '')
-        elif word.endswith('ate'):
-            word = self.replaceM1(word, 'ate', '')
-        elif word.endswith('iti'):
-            word = self.replaceM1(word, 'iti', '')
-        elif word.endswith('ous'):
-            word = self.replaceM1(word, 'ous', '')
-        elif word.endswith('ive'):
-            word = self.replaceM1(word, 'ive', '')
-        elif word.endswith('ize'):
-            word = self.replaceM1(word, 'ize', '')
-        elif word.endswith('ion'):
-            result = word.rfind('ion')
-            base = word[:result]
-            if self.getM(base) > 1 and (self.endsWith(base, 's') or self.endsWith(base, 't')):
-                word = base
-            word = self.replaceM1(word, '', '')
-        return word
     
     def lookup_mutation(self,input_token):
         """ Return a list of all possible Welsh mutations of a given token """
@@ -406,9 +303,19 @@ class PorterStemmer:
         return word
 
 stemmer = PorterStemmer()
-with open(sys.argv[1],"r") as f:
-    content = f.read().strip().split()
-    for token in content:
-        token = token.lower()
-        stem_output = stemmer.stem(token)
+command = 'cat '+sys.argv[1]+' | python3 CyTag/CyTag.py > POStagged.out'
+print(sys.argv[1])
+os.system(command)
+with open("POStagged.out","r") as f:
+    for line in f:
+        #print('Line: ',line.strip())
+        token = line.strip().split("\t")[1].lower()
+        lemma = line.strip().split("\t")[3].lower()
+        pos = line.strip().split("\t")[4].lower()
+        if('|' in lemma):
+            lemma = lemma.split('|')[0].strip()
+        if(pos=='atd'):            
+            stem_output = lemma
+        else:
+            stem_output = stemmer.stem(lemma)
         print('Token :',token,' ==> Stem: ',stem_output)
