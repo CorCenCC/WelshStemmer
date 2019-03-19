@@ -162,6 +162,7 @@ class PorterStemmer:
            
 
     def step1a(self, word):
+        token = word
         for punct in ['!','.',',',';','?']:
             if(word.endswith(punct)):
                 word = self.replace(word,punct[0] ,'')
@@ -229,7 +230,9 @@ class PorterStemmer:
                         word = self.replaceStart(word,'tra','')
                     else:
                         pass
-               
+                if(word==''):
+                    word = token       
+                #print('Word sent ',word)
                 unmutated_candidates = self.lookup_mutation(word)
                 #print(unmutated_candidates)
                 word = self.choose_unmutated(word,unmutated_candidates)
